@@ -47,6 +47,14 @@ The `UMD` version can be directly imported using the `script` tag. The `UMD` ver
 
 [UMD version usage example](./umdExample.html)
 
+### Use Vite
+
+* Install below dependencies and take the ```vite.config.js``` to you project directory just done.
+
+```bash
+npm install @vitejs/plugin-vue2 less -D
+```
+
 ### React version
 
 The reaction version is already under development, so stay tuned

@@ -47,6 +47,14 @@ Vue.use(borderBox1)
 
 [UMD版使用示例](./umdExample.html)
 
+### 使用Vite
+
+* 安装以下依赖，并将```vite.config.js```复制至项目目录即可。
+
+```bash
+npm install @vitejs/plugin-vue2 less -D
+```
+
 ### TODO
 
 * **地图组件**
