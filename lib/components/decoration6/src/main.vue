@@ -1,39 +1,36 @@
 <template>
   <div class="dv-decoration-6" :ref="ref">
     <svg :width="`${svgWH[0]}px`" :height="`${svgWH[1]}px`" :style="`transform:scale(${svgScale[0]},${svgScale[1]});`">
-      <template
+      <rect
         v-for="(point, i) in points"
+        :key="i"
+        :fill="mergedColor[Math.random() > 0.5 ? 0 : 1]"
+        :x="point[0] - halfRectWidth"
+        :y="point[1] - heights[i] / 2"
+        :width="rectWidth"
+        :height="heights[i]"
       >
-        <rect
-          :key="i"
-          :fill="mergedColor[Math.random() > 0.5 ? 0 : 1]"
-          :x="point[0] - halfRectWidth"
-          :y="point[1] - heights[i] / 2"
-          :width="rectWidth"
-          :height="heights[i]"
-        >
-          <animate
-            attributeName="y"
-            :values="`${point[1] - minHeights[i] / 2};${point[1] - heights[i] / 2};${point[1] - minHeights[i] / 2}`"
-            :dur="`${randoms[i]}s`"
-            keyTimes="0;0.5;1"
-            calcMode="spline"
-            keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
-            begin="0s"
-            repeatCount="indefinite"
-          />
-          <animate
-            attributeName="height"
-            :values="`${minHeights[i]};${heights[i]};${minHeights[i]}`"
-            :dur="`${randoms[i]}s`"
-            keyTimes="0;0.5;1"
-            calcMode="spline"
-            keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
-            begin="0s"
-            repeatCount="indefinite"
-          />
-        </rect>
-      </template>
+        <animate
+          attributeName="y"
+          :values="`${point[1] - minHeights[i] / 2};${point[1] - heights[i] / 2};${point[1] - minHeights[i] / 2}`"
+          :dur="`${randoms[i]}s`"
+          keyTimes="0;0.5;1"
+          calcMode="spline"
+          keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
+          begin="0s"
+          repeatCount="indefinite"
+        />
+        <animate
+          attributeName="height"
+          :values="`${minHeights[i]};${heights[i]};${minHeights[i]}`"
+          :dur="`${randoms[i]}s`"
+          keyTimes="0;0.5;1"
+          calcMode="spline"
+          keySplines="0.42,0,0.58,1;0.42,0,0.58,1"
+          begin="0s"
+          repeatCount="indefinite"
+        />
+      </rect>
     </svg>
   </div>
 </template>
