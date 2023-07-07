@@ -1,14 +1,8 @@
 <template>
   <div class="dv-conical-column-chart" :ref="ref">
     <svg :width="width" :height="height">
-      <g
-        v-for="(item, i) in column"
-        :key="i"
-      >
-        <path
-          :d="item.d"
-          :fill="mergedConfig.columnColor"
-        />
+      <g v-for="(item, i) in column" :key="i">
+        <path :d="item.d" :fill="mergedConfig.columnColor" />
         <text
           :style="`fontSize:${mergedConfig.fontSize}px`"
           :fill="mergedConfig.textColor"
@@ -40,180 +34,194 @@
 </template>
 
 <script>
-import autoResize from '../../../mixin/autoResize'
+  import autoResize from "../../../mixin/autoResize";
 
-import { deepMerge } from '@jiaminghi/charts/lib/util/index'
+  import { deepMerge } from "@jiaminghi/charts/lib/util/index";
 
-import { deepClone } from '@jiaminghi/c-render/lib/plugin/util'
+  import { deepClone } from "@jiaminghi/c-render/lib/plugin/util";
 
-export default {
-  name: 'DvConicalColumnChart',
-  mixins: [autoResize],
-  props: {
-    config: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  data () {
-    return {
-      ref: 'conical-column-chart',
-
-      defaultConfig: {
-        /**
-         * @description Chart data
-         * @type {Array<Object>}
-         * @default data = []
-         */
-        data: [],
-        /**
-         * @description Chart img
-         * @type {Array<String>}
-         * @default img = []
-         */
-        img: [],
-        /**
-         * @description Chart font size
-         * @type {Number}
-         * @default fontSize = 12
-         */
-        fontSize: 12,
-        /**
-         * @description Img side length
-         * @type {Number}
-         * @default imgSideLength = 30
-         */
-        imgSideLength: 30,
-        /**
-         * @description Column color
-         * @type {String}
-         * @default columnColor = 'rgba(0, 194, 255, 0.4)'
-         */
-        columnColor: 'rgba(0, 194, 255, 0.4)',
-        /**
-         * @description Text color
-         * @type {String}
-         * @default textColor = '#fff'
-         */
-        textColor: '#fff',
-        /**
-         * @description Show value
-         * @type {Boolean}
-         * @default showValue = false
-         */
-        showValue: false
+  export default {
+    name: "DvConicalColumnChart",
+    mixins: [autoResize],
+    props: {
+      config: {
+        type: Object,
+        default: () => ({}),
       },
-
-      mergedConfig: null,
-
-      column: []
-    }
-  },
-  watch: {
-    config () {
-      const { calcData } = this
-
-      calcData()
-    }
-  },
-  methods: {
-    afterAutoResizeMixinInit () {
-      const { calcData } = this
-
-      calcData()
     },
-    onResize () {
-      const { calcData } = this
+    data() {
+      return {
+        ref: "conical-column-chart",
 
-      calcData()
+        defaultConfig: {
+          /**
+           * @description Chart data
+           * @type {Array<Object>}
+           * @default data = []
+           */
+          data: [],
+          /**
+           * @description Chart img
+           * @type {Array<String>}
+           * @default img = []
+           */
+          img: [],
+          /**
+           * @description Chart font size
+           * @type {Number}
+           * @default fontSize = 12
+           */
+          fontSize: 12,
+          /**
+           * @description Img side length
+           * @type {Number}
+           * @default imgSideLength = 30
+           */
+          imgSideLength: 30,
+          /**
+           * @description Column color
+           * @type {String}
+           * @default columnColor = 'rgba(0, 194, 255, 0.4)'
+           */
+          columnColor: "rgba(0, 194, 255, 0.4)",
+          /**
+           * @description Text color
+           * @type {String}
+           * @default textColor = '#fff'
+           */
+          textColor: "#fff",
+          /**
+           * @description Show value
+           * @type {Boolean}
+           * @default showValue = false
+           */
+          showValue: false,
+        },
+
+        mergedConfig: null,
+
+        column: [],
+      };
     },
-    calcData () {
-      const { mergeConfig, initData, calcSVGPath } = this
+    watch: {
+      config() {
+        const { calcData } = this;
 
-      mergeConfig()
-
-      initData()
-
-      calcSVGPath()
+        calcData();
+      },
     },
-    mergeConfig () {
-      const { defaultConfig, config } = this
+    methods: {
+      afterAutoResizeMixinInit() {
+        const { calcData } = this;
 
-      this.mergedConfig = deepMerge(deepClone(defaultConfig, true), config || {})
-    },
-    initData () {
-      const { mergedConfig } = this
-      let { data } = mergedConfig
+        calcData();
+      },
+      onResize() {
+        const { calcData } = this;
 
-      data = deepClone(data, true)
+        calcData();
+      },
+      calcData() {
+        const { mergeConfig, initData, calcSVGPath } = this;
 
-      data.sort(({ value: a }, { value: b }) => {
-        if (a > b) return -1
-        if (a < b) return 1
-        if (a === b) return 0
-      })
+        mergeConfig();
 
-      const max = data[0] ? data[0].value : 10
+        initData();
 
-      data = data.map(item => ({
-        ...item,
-        percent: item.value / max
-      }))
+        calcSVGPath();
+      },
+      mergeConfig() {
+        const { defaultConfig, config } = this;
 
-      mergedConfig.data = data
-    },
-    calcSVGPath () {
-      const { mergedConfig, width, height } = this
+        this.mergedConfig = deepMerge(
+          deepClone(defaultConfig, true),
+          config || {}
+        );
+      },
+      initData() {
+        const { mergedConfig } = this;
+        let { data } = mergedConfig;
 
-      const { imgSideLength, fontSize, data } = mergedConfig
+        data = deepClone(data, true);
 
-      const itemNum = data.length
-      const gap = width / (itemNum + 1)
+        data.sort(({ value: a }, { value: b }) => {
+          if (a > b) return -1;
+          if (a < b) return 1;
+          if (a === b) return 0;
+        });
 
-      const useAbleHeight = height - imgSideLength - fontSize - 5
-      const svgBottom = height - fontSize - 5
+        const max = data[0] ? data[0].value : 10;
 
-      this.column = data.map((item, i) => {
-        const { percent } = item
+        data = data.map((item) => ({
+          ...item,
+          percent: this.computePercent(item.value, max),
+        }));
 
-        const middleXPos = gap * (i + 1)
-        const leftXPos = gap * i
-        const rightXpos = gap * (i + 2)
+        mergedConfig.data = data;
+      },
+      computePercent(value, max) {
+        if (value) {
+          if (value / max < 0.2) {
+            return 0.2;
+          } else {
+            return value / max;
+          }
+        } else {
+          return 0.2;
+        }
+      },
+      calcSVGPath() {
+        const { mergedConfig, width, height } = this;
 
-        const middleYPos = svgBottom - useAbleHeight * percent
-        const controlYPos = useAbleHeight * percent * 0.6 + middleYPos
+        const { imgSideLength, fontSize, data } = mergedConfig;
 
-        const d = `
+        const itemNum = data.length;
+        const gap = width / (itemNum + 1);
+
+        const useAbleHeight = height - imgSideLength - fontSize - 5;
+        const svgBottom = height - fontSize - 9;
+
+        this.column = data.map((item, i) => {
+          const { percent } = item;
+
+          const middleXPos = gap * (i + 1);
+          const leftXPos = gap * i;
+          const rightXpos = gap * (i + 2);
+
+          const middleYPos = svgBottom - useAbleHeight * percent;
+          const controlYPos = useAbleHeight * percent * 0.6 + middleYPos;
+
+          const d = `
           M${leftXPos}, ${svgBottom}
           Q${middleXPos}, ${controlYPos} ${middleXPos},${middleYPos}
           M${middleXPos},${middleYPos}
           Q${middleXPos}, ${controlYPos} ${rightXpos},${svgBottom}
           L${leftXPos}, ${svgBottom}
           Z
-        `
+        `;
 
-        const textY = (svgBottom + middleYPos) / 2 + fontSize / 2
+          const textY = (svgBottom + middleYPos) / 2 + fontSize / 2;
 
-        return {
-          ...item,
-          d,
-          x: middleXPos,
-          y: middleYPos,
-          textY
-        }
-      })
-    }
-  }
-}
+          return {
+            ...item,
+            d,
+            x: middleXPos,
+            y: middleYPos,
+            textY,
+          };
+        });
+      },
+    },
+  };
 </script>
 
 <style lang="less">
-.dv-conical-column-chart {
-  width: 100%;
-  height: 100%;
+  .dv-conical-column-chart {
+    width: 100%;
+    height: 100%;
 
-  text {
-    text-anchor: middle;
+    text {
+      text-anchor: middle;
+    }
   }
-}
 </style>
