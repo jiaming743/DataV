@@ -5,18 +5,22 @@
       v-for="(item, i) in rows"
       :key="item.toString() + item.scroll"
       :style="`height: ${heights[i]}px;`"
+      @click="itemClick(item)"
     >
       <div class="ranking-info">
         <div class="rank">No.{{ item.ranking }}</div>
         <div class="info-name" v-html="item.name" />
-        <div class="ranking-value">{{ mergedConfig.valueFormatter ? mergedConfig.valueFormatter(item) : item.value + mergedConfig.unit }}</div>
+        <div class="ranking-value">
+          {{
+            mergedConfig.valueFormatter
+              ? mergedConfig.valueFormatter(item)
+              : item.value + mergedConfig.unit
+          }}
+        </div>
       </div>
 
       <div class="ranking-column">
-        <div
-          class="inside-column"
-          :style="`width: ${item.percent}%;`"
-        >
+        <div class="inside-column" :style="`width: ${item.percent}%;`">
           <div class="shine" />
         </div>
       </div>
@@ -25,24 +29,24 @@
 </template>
 
 <script>
-import autoResize from '../../../mixin/autoResize'
+import autoResize from "../../../mixin/autoResize";
 
-import { deepMerge } from '@jiaminghi/charts/lib/util/index'
+import { deepMerge } from "@jiaminghi/charts/lib/util/index";
 
-import { deepClone } from '@jiaminghi/c-render/lib/plugin/util'
+import { deepClone } from "@jiaminghi/c-render/lib/plugin/util";
 
 export default {
-  name: 'DvScrollRankingBoard',
+  name: "DvScrollRankingBoard",
   mixins: [autoResize],
   props: {
     config: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
-  data () {
+  data() {
     return {
-      ref: 'scroll-ranking-board',
+      ref: "scroll-ranking-board",
 
       defaultConfig: {
         /**
@@ -69,14 +73,14 @@ export default {
          * @default carousel = 'single'
          * @example carousel = 'single' | 'page'
          */
-        carousel: 'single',
+        carousel: "single",
         /**
          * @description Value unit
          * @type {String}
          * @default unit = ''
          * @example unit = 'ton'
          */
-        unit: '',
+        unit: "",
         /**
          * @description Auto sort by value
          * @type {Boolean}
@@ -88,7 +92,7 @@ export default {
          * @type {Function}
          * @default valueFormatter = null
          */
-        valueFormatter: null
+        valueFormatter: null,
       },
 
       mergedConfig: null,
@@ -101,151 +105,169 @@ export default {
 
       animationIndex: 0,
 
-      animationHandler: '',
+      animationHandler: "",
 
-      updater: 0
-    }
+      updater: 0,
+    };
   },
   watch: {
-    config () {
-      const { stopAnimation, calcData } = this
+    config() {
+      const { stopAnimation, calcData } = this;
 
-      stopAnimation()
+      stopAnimation();
 
-      calcData()
-    }
+      calcData();
+    },
   },
   methods: {
-    afterAutoResizeMixinInit () {
-      const { calcData } = this
-
-      calcData()
+    itemClick(item) {
+      this.$emit("itemClick", item);
     },
-    onResize () {
-      const { mergedConfig, calcHeights } = this
+    afterAutoResizeMixinInit() {
+      const { calcData } = this;
 
-      if (!mergedConfig) return
-
-      calcHeights(true)
+      calcData();
     },
-    calcData () {
-      const { mergeConfig, calcRowsData } = this
+    onResize() {
+      const { mergedConfig, calcHeights } = this;
 
-      mergeConfig()
+      if (!mergedConfig) return;
 
-      calcRowsData()
-
-      const { calcHeights } = this
-
-      calcHeights()
-
-      const { animation } = this
-
-      animation(true)
+      calcHeights(true);
     },
-    mergeConfig () {
-      let { config, defaultConfig } = this
+    calcData() {
+      const { mergeConfig, calcRowsData } = this;
 
-      this.mergedConfig = deepMerge(deepClone(defaultConfig, true), config || {})
+      mergeConfig();
+
+      calcRowsData();
+
+      const { calcHeights } = this;
+
+      calcHeights();
+
+      const { animation } = this;
+
+      animation(true);
     },
-    calcRowsData () {
-      let { data, rowNum, sort } = this.mergedConfig
+    mergeConfig() {
+      let { config, defaultConfig } = this;
 
-      sort && data.sort(({ value: a }, { value: b }) => {
-        if (a > b) return -1
-        if (a < b) return 1
-        if (a === b) return 0
-      })
+      this.mergedConfig = deepMerge(
+        deepClone(defaultConfig, true),
+        config || {}
+      );
+    },
+    calcRowsData() {
+      let { data, rowNum, sort } = this.mergedConfig;
 
-      const value = data.map(({ value }) => value)
-      
-      const min = Math.min(...value) || 0
+      sort &&
+        data.sort(({ value: a }, { value: b }) => {
+          if (a > b) return -1;
+          if (a < b) return 1;
+          if (a === b) return 0;
+        });
+
+      const value = data.map(({ value }) => value);
+
+      const min = Math.min(...value) || 0;
 
       // abs of min
-      const minAbs = Math.abs(min)
+      const minAbs = Math.abs(min);
 
-      const max = Math.max(...value) || 0
+      const max = Math.max(...value) || 0;
 
       // abs of max
-      const maxAbs = Math.abs(max)
+      const maxAbs = Math.abs(max);
 
-      const total = max + minAbs
+      const total = max + minAbs;
 
-      data = data.map((row, i) => ({ ...row, ranking: i + 1, percent: (row.value + minAbs) / total * 100 }))
+      data = data.map((row, i) => ({
+        ...row,
+        ranking: i + 1,
+        percent: ((row.value + minAbs) / total) * 100,
+      }));
 
-      const rowLength = data.length
+      const rowLength = data.length;
 
       if (rowLength > rowNum && rowLength < 2 * rowNum) {
-        data = [...data, ...data]
+        data = [...data, ...data];
       }
 
-      data = data.map((d, i) => ({ ...d, scroll: i }))
+      data = data.map((d, i) => ({ ...d, scroll: i }));
 
-      this.rowsData = data
-      this.rows = data
+      this.rowsData = data;
+      this.rows = data;
     },
-    calcHeights (onresize = false) {
-      const { height, mergedConfig } = this
+    calcHeights(onresize = false) {
+      const { height, mergedConfig } = this;
 
-      const { rowNum, data } = mergedConfig
+      const { rowNum, data } = mergedConfig;
 
-      const avgHeight = height / rowNum
+      const avgHeight = height / rowNum;
 
-      this.avgHeight = avgHeight
+      this.avgHeight = avgHeight;
 
-      if (!onresize) this.heights = new Array(data.length).fill(avgHeight)
+      if (!onresize) this.heights = new Array(data.length).fill(avgHeight);
     },
-    async animation (start = false) {
-      let { avgHeight, animationIndex, mergedConfig, rowsData, animation, updater } = this
+    async animation(start = false) {
+      let {
+        avgHeight,
+        animationIndex,
+        mergedConfig,
+        rowsData,
+        animation,
+        updater,
+      } = this;
 
-      const { waitTime, carousel, rowNum } = mergedConfig
+      const { waitTime, carousel, rowNum } = mergedConfig;
 
-      const rowLength = rowsData.length
+      const rowLength = rowsData.length;
 
-      if (rowNum >= rowLength) return
+      if (rowNum >= rowLength) return;
 
       if (start) {
-        await new Promise(resolve => setTimeout(resolve, waitTime))
-        if (updater !== this.updater) return
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+        if (updater !== this.updater) return;
       }
 
-      const animationNum = carousel === 'single' ? 1 : rowNum
+      const animationNum = carousel === "single" ? 1 : rowNum;
 
-      let rows = rowsData.slice(animationIndex)
-      rows.push(...rowsData.slice(0, animationIndex))
+      let rows = rowsData.slice(animationIndex);
+      rows.push(...rowsData.slice(0, animationIndex));
 
-      this.rows = rows.slice(0, rowNum + 1)
-      this.heights = new Array(rowLength).fill(avgHeight)
+      this.rows = rows.slice(0, rowNum + 1);
+      this.heights = new Array(rowLength).fill(avgHeight);
 
-      await new Promise(resolve => setTimeout(resolve, 300))
-      if (updater !== this.updater) return
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      if (updater !== this.updater) return;
 
-      this.heights.splice(0, animationNum, ...new Array(animationNum).fill(0))
+      this.heights.splice(0, animationNum, ...new Array(animationNum).fill(0));
 
-      animationIndex += animationNum
+      animationIndex += animationNum;
 
-      const back = animationIndex - rowLength
-      if (back >= 0) animationIndex = back
+      const back = animationIndex - rowLength;
+      if (back >= 0) animationIndex = back;
 
-      this.animationIndex = animationIndex
-      this.animationHandler = setTimeout(animation, waitTime - 300)
+      this.animationIndex = animationIndex;
+      this.animationHandler = setTimeout(animation, waitTime - 300);
     },
-    stopAnimation () {
-      const { animationHandler, updater } = this
+    stopAnimation() {
+      const { animationHandler, updater } = this;
 
-      this.updater = (updater + 1) % 999999
+      this.updater = (updater + 1) % 999999;
 
-      if (!animationHandler) return
+      if (!animationHandler) return;
 
-      clearTimeout(animationHandler)
+      clearTimeout(animationHandler);
     },
   },
-  destroyed () {
-    const { stopAnimation } = this
+  destroyed() {
+    const { stopAnimation } = this;
 
-    stopAnimation()
-  }
-}
+    stopAnimation();
+  },
+};
 </script>
 
 <style lang="less">
