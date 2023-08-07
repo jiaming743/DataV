@@ -9,6 +9,7 @@
           height: ${mergedConfig.headerHeight}px;
           line-height: ${mergedConfig.headerHeight}px;
           width: ${widths[i]}px;
+          font-size: ${mergedConfig.headerFontSize}px
         `"
         :align="aligns[i]"
         v-html="headerItem"
@@ -27,14 +28,14 @@
         :style="`
           height: ${heights[ri]}px;
           line-height: ${heights[ri]}px;
-          background-color: ${mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']};
+          background: ${mergedConfig.highlightRowNum > 0 && row.rowIndex < mergedConfig.highlightRowNum ? `linear-gradient(to left, rgba(0,0,0,0) 0%,${mergedConfig.highlightBgColor} 50%, rgba(0,0,0,0) 100%)` : (mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC'])};
         `"
       >
         <div
           class="ceil"
           v-for="(ceil, ci) in row.ceils"
           :key="`${ceil}${ri}${ci}`"
-          :style="`width: ${widths[ci]}px;`"
+          :style="`width: ${widths[ci]}px;font-size: ${mergedConfig.bodyFontSize}px`"
           :align="aligns[ci]"
           v-html="ceil"
           @click="emitEvent('click', ri, ci, row, ceil)"
@@ -118,6 +119,18 @@ export default {
          */
         headerHeight: 35,
         /**
+         * @description Header font size
+         * @type {Number}
+         * @default headerFontSize = 15
+         */
+        headerFontSize: 15,
+        /**
+         * @description Body font size
+         * @type {Number}
+         * @default bodyFontSize = 14
+         */
+        bodyFontSize: 14,
+        /**
          * @description Column width
          * @type {Array<Number>}
          * @default columnWidth = []
@@ -155,7 +168,19 @@ export default {
          * @default hoverPause = true
          * @example hoverPause = true | false
          */
-        hoverPause: true
+        hoverPause: true,
+        /**
+         * @description highlight rowNum
+         * @type {Number}
+         * @default highlightRowNum = 0
+         */
+        highlightRowNum: 0,
+        /**
+         * @description highlight color
+         * @type {String}
+         * @default highlightBgColor = '#fff'
+         */
+        highlightBgColor: '#fff'
       },
 
       mergedConfig: null,
