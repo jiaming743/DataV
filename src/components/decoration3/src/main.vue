@@ -3,10 +3,9 @@
     <svg :width="`${svgWH[0]}px`" :height="`${svgWH[1]}px`" :style="`transform:scale(${svgScale[0]},${svgScale[1]});`">
 
       <template
-        v-for="(point, i) in points"
+        v-for="(point, i) in points" :key="i"
       >
         <rect
-          :key="i"
           :fill="mergedColor[0]"
           :x="point[0] - halfPointSideLength"
           :y="point[1] - halfPointSideLength"
